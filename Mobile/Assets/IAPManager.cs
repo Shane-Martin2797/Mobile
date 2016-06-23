@@ -52,6 +52,7 @@ public class IAPManager : BaseSingleton<IAPManager>,
 
 		// Create a builder, first passing in a suite of Unity provided stores.
 		var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
+
 		for (int i = 0; i < Products.Count; i++) 
 		{
 			if (Products [i].productType == ProductType.Subscription) 
@@ -76,12 +77,12 @@ public class IAPManager : BaseSingleton<IAPManager>,
 		return m_StoreController != null && m_StoreExtensionProvider != null;
 	}
 
-	public void BuyProduct(int i)
+	public void BuyProduct(int productInt)
 	{
-		BuyProductID (Products [i].productStringID);
+		BuyProductID (Products [productInt].productStringID);
 	}
 
-	void BuyProductID(string productId)
+	private void BuyProductID(string productId)
 	{
 		// If Purchasing has been initialized ...
 		if (IsInitialized())
