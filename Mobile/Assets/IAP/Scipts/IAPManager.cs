@@ -24,12 +24,6 @@ public class IAPManager : BaseSingleton<IAPManager>,
 
 	public List<IAPProduct> Products = new List<IAPProduct>();
 
-	// Apple App Store-specific product identifier for the subscription product.
-	private const string kProductNameAppleSubscription =  "com.unity3d.subscription.new";
-
-	// Google Play Store-specific product identifier subscription product.
-	private const string kProductNameGooglePlaySubscription =  "com.unity3d.subscription.original"; 
-
 
 	void Start()
 	{
@@ -55,14 +49,7 @@ public class IAPManager : BaseSingleton<IAPManager>,
 
 		for (int i = 0; i < Products.Count; i++) 
 		{
-			if (Products [i].productType == ProductType.Subscription) 
-			{
-				builder.AddProduct (Products [i].productStringID, Products [i].productType, new IDs(){{ kProductNameAppleSubscription, AppleAppStore.Name },{ kProductNameGooglePlaySubscription, GooglePlay.Name },});
-			} 
-			else 
-			{
-				builder.AddProduct (Products [i].productStringID, Products [i].productType);
-			}
+			builder.AddProduct (Products [i].productStringID, Products [i].productType);
 		}
 
 		// Kick off the remainder of the set-up with an asynchrounous call, passing the configuration 
@@ -115,42 +102,7 @@ public class IAPManager : BaseSingleton<IAPManager>,
 	}
 
 
-	// Restore purchases previously made by this customer. Some platforms automatically restore purchases, like Google. 
-	// Apple currently requires explicit purchase restoration for IAP, conditionally displaying a password prompt.
-	public void RestorePurchases()
-	{
-		// If Purchasing has not yet been set up ...
-		if (!IsInitialized())
-		{
-			// ... report the situation and stop restoring. Consider either waiting longer, or retrying initialization.
-			Debug.Log("RestorePurchases FAIL. Not initialized.");
-			return;
-		}
 
-		// If we are running on an Apple device ... 
-		if (Application.platform == RuntimePlatform.IPhonePlayer || 
-			Application.platform == RuntimePlatform.OSXPlayer)
-		{
-			// ... begin restoring purchases
-			Debug.Log("RestorePurchases started ...");
-
-			// Fetch the Apple store-specific subsystem.
-			var apple = m_StoreExtensionProvider.GetExtension<IAppleExtensions>();
-			// Begin the asynchronous process of restoring purchases. Expect a confirmation response in 
-			// the Action<bool> below, and ProcessPurchase if there are previously purchased products to restore.
-			apple.RestoreTransactions((result) => {
-				// The first phase of restoration. If no more responses are received on ProcessPurchase then 
-				// no purchases are available to be restored.
-				Debug.Log("RestorePurchases continuing: " + result + ". If no further messages, no purchases available to restore.");
-			});
-		}
-		// Otherwise ...
-		else
-		{
-			// We are not running on an Apple device. No work is necessary to restore purchases.
-			Debug.Log("RestorePurchases FAIL. Not supported on this platform. Current = " + Application.platform);
-		}
-	}
 
 
 	//  
